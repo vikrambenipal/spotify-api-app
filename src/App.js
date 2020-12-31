@@ -17,6 +17,7 @@ const App = () => {
   ]
 
   const [token, setToken] = useState('');
+  const [genres, setGenres] = useState([]);
 
   useEffect(() => {
     axios('https://accounts.spotify.com/api/token', {
@@ -26,17 +27,29 @@ const App = () => {
     },
     data: 'grant_type=client_credentials',
     method: 'POST'
+  
+  
   })
   .then(tokenResponse => {
     console.log(tokenResponse.data.access_token);
-    setToken(tokenResponse.data.access_token)});
+    setToken(tokenResponse.data.access_token);
+
+    axios('https://api.spotify.com/v1/browse/categories?locale=sv_US',{
+      method: 'GET',
+      headers: { 'Authorization' : 'Bearer ' + tokenResponse.data.access_token}
+    })
+    .then(genreResponse => {
+      setGenres(genreResponse.data.categories.items)
+    })
+  });
+
   }, [])
 
   return (
 
     <form onSubmit={() => {}}>
       <div>
-      <Dropdown options={data} />
+      <Dropdown options={genres} />
       <Dropdown options={data} />
       <button type='submit'>
         Search
